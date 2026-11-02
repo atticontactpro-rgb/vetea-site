@@ -511,25 +511,28 @@ const PACK_JOG   = [F("pack-jogging-face"), F("pack-jogging-dos")];
 const PACK_TEE   = [F("pack-tshirt-face"), F("pack-tshirt-dos")];
 const PHOTOS = {
   sweat: {
-    homme: [...PACK_SWEAT, F("sweat-homme-detail")],
-    femme: [F("sweat-femme-1"), F("sweat-femme-detail"), ...PACK_SWEAT]
+    homme: [F("ensemble-homme-1"), F("ensemble-homme-2"), F("sweat-homme-detail"), ...PACK_SWEAT],
+    femme: [F("sweat-femme-1"), F("ensemble-femme-2"), F("sweat-femme-detail"), ...PACK_SWEAT]
   },
-  jogging: { homme: PACK_JOG, femme: [F("jogging-femme-1"), F("jogging-femme-2"), ...PACK_JOG] },
+  jogging: {
+    homme: [F("jogging-tshirt-homme-1"), F("jogging-tshirt-homme-2"), ...PACK_JOG],
+    femme: [F("jogging-femme-1"), F("jogging-femme-2"), ...PACK_JOG]
+  },
   tshirt: {
     homme: [F("tshirt-homme-1"), F("tshirt-homme-2"), ...PACK_TEE],
     femme: [F("tshirt-femme-1"), F("tshirt-femme-2"), ...PACK_TEE]
   },
   ensemble: {
-    homme: [F("pack-ensemble-face"), F("pack-ensemble-dos")],
+    homme: [F("ensemble-homme-1"), F("ensemble-homme-2"), F("pack-ensemble-face"), F("pack-ensemble-dos")],
     femme: [F("ensemble-femme-1"), F("ensemble-femme-2"), F("pack-ensemble-face"), F("pack-ensemble-dos")]
   },
   packJT: {
-    homme: [F("jogging-tshirt-homme-1"), F("jogging-tshirt-homme-2")],
-    femme: [F("jogging-tshirt-femme-1"), F("jogging-tshirt-femme-2")]
+    homme: [F("jogging-tshirt-homme-1"), F("jogging-tshirt-homme-2"), F("pack-tshirt-face"), F("pack-jogging-face")],
+    femme: [F("jogging-tshirt-femme-1"), F("jogging-tshirt-femme-2"), F("pack-tshirt-face"), F("pack-jogging-face")]
   },
   look: {
-    homme: [F("pack-look-face"), F("pack-look-dos")],
-    femme: [F("pack-look-face"), F("pack-look-dos")]
+    homme: [F("ensemble-homme-1"), F("jogging-tshirt-homme-1"), F("pack-look-face"), F("pack-look-dos")],
+    femme: [F("ensemble-femme-1"), F("jogging-tshirt-femme-1"), F("pack-look-face"), F("pack-look-dos")]
   }
 };
 let gender = "homme";
