@@ -610,7 +610,7 @@ function render(){
   document.getElementById("singles").innerHTML = SINGLES.map(o => card(o, false)).join("");
   document.getElementById("bundles").innerHTML = BUNDLES.map(o => card(o, true)).join("");
   const all = Object.keys(CONFIG.stock).reduce((t, p) => t + total(p), 0);
-  document.getElementById("count").innerHTML = `Édition limitée : <b>plus que ${all} pièces</b>, pas de réassort.`;
+  document.getElementById("count").innerHTML = `Édition limitée : <b>fais partie de la team</b>.`;
   document.getElementById("packs-note").textContent = `Jusqu'à 30 € d'économie, et la livraison offerte. Une seule lettre et un seul coffret, avec toutes les pièces dedans.`;
   document.getElementById("faq-ship").textContent = `Ta commande part sous 72 h en point relais ou à domicile, en France. Compte 2 à 4 jours de livraison. Frais de port : ${euro2(CONFIG.shipping)}, offerts avec un ensemble ou dès ${CONFIG.freeFrom} € d'achat.` + (CONFIG.showChristmas ? ` Pour Noël, commande avant le ${CONFIG.christmasDeadline}.` : "");
   const strip = document.getElementById("strip");
