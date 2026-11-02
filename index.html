@@ -114,6 +114,9 @@ legend{font-size:14px;font-weight:600;margin-bottom:8px;padding:0}
 .sizes input:checked+span{background:var(--ink);border-color:var(--ink);color:#fff}
 .sizes input:focus-visible+span{outline:3px solid var(--lagoon);outline-offset:2px}
 .sizes input:disabled+span{color:#b4b4b0;border-style:dashed;text-decoration:line-through;cursor:not-allowed}
+.upsell{display:block;font-size:14px;font-weight:600;color:var(--lagoon);background:var(--lagoon-soft);border-radius:10px;padding:10px 12px;text-decoration:none}
+.upsell:hover{text-decoration:underline}
+.card:target{outline:3px solid var(--lagoon);outline-offset:3px}
 .stock-note{font-size:14px;color:var(--lagoon);font-weight:600;min-height:20px}
 .card .btn{margin-top:auto;width:100%}
 .pay-note{font-size:13px;color:var(--muted);text-align:center}
@@ -498,8 +501,8 @@ const SINGLES = [
   { id: "tshirt",  pieces: ["tshirt"],  price: 45, desc: "Coton 220 g/m². Masque sur la poitrine, grand logo Vétéa dans le dos." }
 ];
 const BUNDLES = [
-  { id: "ensemble", name: "Ensemble Ink Spirit", pieces: ["sweat","jogging"], price: 149, desc: "Le sweat et le jogging assortis." },
   { id: "packJT",   name: "Jogging + t-shirt",   pieces: ["jogging","tshirt"], price: 105, desc: "La tenue légère, pour tous les jours." },
+  { id: "ensemble", name: "Ensemble Ink Spirit", pieces: ["sweat","jogging"], price: 159, desc: "Le sweat et le jogging assortis.", upsell: "look" },
   { id: "look",     name: "Le look complet",     pieces: ["sweat","jogging","tshirt"], price: 179, desc: "Les trois pièces du drop." }
 ];
 
@@ -540,7 +543,7 @@ let gender = "homme";
 try { const g = localStorage.getItem("vetea-gender"); if (g === "homme" || g === "femme") gender = g; } catch (e) {}
 
 function visualHTML(o, isBundle, sum){
-  const badge = isBundle ? `<span class="save">${euro(sum - o.price)} d'économie</span>` : "";
+  const badge = isBundle ? `<span class="save">${o.id === "look" ? "Le plus avantageux · " : ""}${euro(sum - o.price)} d'économie</span>` : "";
   const set = PHOTOS[o.id] && PHOTOS[o.id][gender];
   if (set && set.length){
     const name = isBundle ? o.name : PIECES[o.id].name;
@@ -576,11 +579,12 @@ function card(o, isBundle){
   const title = isBundle ? o.name : PIECES[o.id].name;
   const pickers = o.pieces.map(p => sizePicker(o.id, p, o.pieces.length > 1 ? `Taille ${PIECES[p].short.toLowerCase()}` : "Taille")).join("");
   const soldOut = o.pieces.some(p => total(p) === 0);
-  return `<article class="card" data-offer="${o.id}">
+  return `<article class="card" id="card-${o.id}" data-offer="${o.id}">
     <div class="visual${PHOTOS[o.id] ? " has-photos" : ""}">${visualHTML(o, isBundle, sum)}</div>
     <div class="card-body">
       <div class="card-top"><h3>${title}</h3><span class="price">${isBundle ? `<s>${euro(sum)}</s>` : ""}${euro(o.price)}</span></div>
       <p class="card-desc">${o.desc}</p>
+      ${o.upsell ? (() => { const u = BUNDLES.find(x => x.id === o.upsell); return `<a class="upsell" href="#card-${u.id}">Pour ${euro(u.price - o.price)} de plus, le t-shirt est inclus : voir ${u.name.toLowerCase()}</a>`; })() : ""}
       ${pickers}
       <p class="stock-note" aria-live="polite"></p>
       <button class="btn" type="button" ${soldOut ? "disabled" : ""}>${soldOut ? "Épuisé" : "Ajouter au panier"}</button>

@@ -30,7 +30,7 @@ const OFFERS = {
   sweat:    { name: "Sweat à capuche Ink Spirit",        price: 85,  pieces: ["sweat"] },
   jogging:  { name: "Jogging Ink Spirit",                price: 79,  pieces: ["jogging"] },
   tshirt:   { name: "T-shirt Ink Spirit",                price: 45,  pieces: ["tshirt"] },
-  ensemble: { name: "Ensemble Ink Spirit (sweat + jogging)", price: 149, pieces: ["sweat", "jogging"], bundle: true },
+  ensemble: { name: "Ensemble Ink Spirit (sweat + jogging)", price: 159, pieces: ["sweat", "jogging"], bundle: true },
   packJT:   { name: "Jogging + t-shirt Ink Spirit",      price: 105, pieces: ["jogging", "tshirt"], bundle: true },
   look:     { name: "Look complet Ink Spirit",           price: 179, pieces: ["sweat", "jogging", "tshirt"], bundle: true }
 };
