@@ -163,6 +163,7 @@ tbody th{text-align:left;font-weight:500;color:var(--muted)}
 .pl.motif{background:#fff url(img/motif-coffret-h.svg) center/cover no-repeat}
 .pl.motif.alt{background-position:30% center}
 .pl.mstrip{background:#fff url(img/motif-coffret-h.svg) center/auto 900% repeat-x}
+.pl.fwall img{width:34%;height:auto}
 .pl.flap img{width:72%;max-height:78%;object-fit:contain}
 .pl.top img{width:40%}
 .pl.back img{width:54%}
@@ -834,7 +835,7 @@ const box3d = (() => {
   P(cube, "+z", W - 4 * t, H - 2 * t, 0, y0 + t + (H - 2 * t) / 2, -D / 2 + t, "inner");
   arcX(cube, W - 2 * r, y1 - r, -(D / 2 - r), r, 180, 270, 3, "edge");
   // avant (double paroi, roulée en haut ; cachée par le rabat quand c'est fermé)
-  P(cube, "+z", W - 2 * r, H - t - r, 0, (y0 + t + y1 - r) / 2, D / 2, "");
+  P(cube, "+z", W - 2 * r, H - t - r, 0, (y0 + t + y1 - r) / 2, D / 2, "fwall", '<img src="img/logo.svg" alt="">');
   arcX(cube, W - 4 * t, y0 + t, D / 2 - t, t, 0, 180, 6, "edge");
   P(cube, "-z", W - 4 * t, H - 2 * t, 0, y0 + t + (H - 2 * t) / 2, D / 2 - 2 * t, "inner");
   arcX(cube, W - 2 * r, y1 - r, D / 2 - r, r, 0, -90, 3, "edge");
