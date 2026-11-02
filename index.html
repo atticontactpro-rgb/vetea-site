@@ -174,7 +174,27 @@ tbody th{text-align:left;font-weight:500;color:var(--muted)}
 .card3d img{height:16px;width:auto;margin-bottom:12px}
 .card3d .name{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:24px;line-height:1.05;margin-bottom:8px;word-break:break-word}
 .card3d p{font-size:11.5px;line-height:1.5;color:#333;margin:0}
-.card3d .sig{margin-top:8px;font-weight:700;color:#000}
+.card3d .secret{filter:blur(3.2px);user-select:none;-webkit-user-select:none;pointer-events:none}
+.card3d .secret p+p{margin-top:6px}
+.card3d .sig{margin-top:12px;font-family:var(--display);font-stretch:110%;font-weight:800;font-size:15px;color:#000;text-align:right}
+/* t-shirt plié dans le coffret */
+.pl.tee{background:
+  repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 3px),
+  linear-gradient(90deg,#dedfdb 0,#f1f1ee 6%,#fbfbf9 20%,#fff 50%,#fafaf8 80%,#efefec 94%,#dcdcd8 100%);display:block;border-radius:10px 10px 6px 6px}
+.pl.tee.side{background:linear-gradient(#f4f4f1,#dcdcd7);border-radius:2px}
+.pl.teeshadow{background:radial-gradient(closest-side,rgba(0,0,0,.22),rgba(0,0,0,.08) 70%,transparent);filter:blur(5px)}
+.pl.teeshadow::after{display:none}
+.tee-collar{position:absolute;left:50%;top:-20px;width:70px;height:44px;margin-left:-35px;border-radius:50%;border:5px solid #e3e3df;background:radial-gradient(circle at 50% 30%,#cfcfca,#e9e9e5 70%);box-shadow:0 2px 3px rgba(0,0,0,.12),inset 0 0 0 1px rgba(0,0,0,.05)}
+.tee-collar::after{content:"";position:absolute;inset:-5px;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.06) 0 2deg,transparent 2deg 5deg);-webkit-mask:radial-gradient(closest-side,transparent 80%,#000 82%);mask:radial-gradient(closest-side,transparent 80%,#000 82%)}
+.tee-sl{position:absolute;top:0;width:24%;height:46%;background:linear-gradient(var(--a),rgba(0,0,0,.09),rgba(0,0,0,0) 60%)}
+.tee-sl.l{left:0;--a:115deg;border-right:1px solid rgba(0,0,0,.06)}
+.tee-sl.r{right:0;--a:245deg;border-left:1px solid rgba(0,0,0,.06)}
+.tee-fold{position:absolute;top:0;bottom:0;width:6px;background:linear-gradient(90deg,rgba(0,0,0,.07),rgba(0,0,0,0))}
+.tee-fold.l{left:24%}.tee-fold.r{right:24%;transform:scaleX(-1)}
+.tee-hem{position:absolute;left:0;right:0;bottom:0;height:16px;background:linear-gradient(rgba(0,0,0,.06),rgba(0,0,0,0) 30%,rgba(0,0,0,.05));border-top:1px solid rgba(0,0,0,.05)}
+.tee-print{position:absolute;left:50%;top:40px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.92}
+.tee-print .m{width:28px}.tee-print .w{width:40px}
+.tee-label{position:absolute;left:26%;bottom:20px;width:12px;height:13px;background:#151515;border-radius:1px}
 .box-ctrl{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
 .btn.light{background:#fff;color:#000}
 .hint-3d{font-size:14px;color:#9a9a96}
@@ -332,8 +352,11 @@ footer nav{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted)}
             <div class="card3d" id="card3d">
               <img src="img/logo.svg" alt="">
               <div class="name" id="lname">Alexis,</div>
-              <p>Ce que tu portes vient des signes du tatouage tahitien. Ce motif est maintenant un peu à toi.</p>
-              <p class="sig">Attilio, fondateur de Vétéa</p>
+              <div class="secret" aria-hidden="true">
+                <p>Ce que tu portes vient des signes du tatouage tahitien. Chacun raconte une histoire, et celle-ci commence avec toi.</p>
+                <p>Ce motif est maintenant un peu à toi. Merci de faire partie de l'aventure.</p>
+              </div>
+              <p class="sig">Vétéa</p>
             </div>
           </div>
         </div>
@@ -835,6 +858,15 @@ const box3d = (() => {
   P(cube, "-z", W - 4 * t, H - 2 * t, 0, y0 + t + (H - 2 * t) / 2, D / 2 - 2 * t, "inner");
   arcX(cube, W - 2 * r, y1 - r, D / 2 - r, r, 0, -90, 3, "edge");
 
+  // ---------- t-shirt plié posé au fond ----------
+  const TW = 176, TD = 188, th = 10, ty = y1 - t - th, tz = 22;
+  P(cube, "-y", TW + 26, TD + 26, 4, y1 - t - 0.6, tz + 6, "teeshadow");
+  P(cube, "-y", TW, TD, 0, ty, tz, "tee",
+    '<div class="tee-sl l"></div><div class="tee-sl r"></div><div class="tee-collar"></div><div class="tee-fold l"></div><div class="tee-fold r"></div><div class="tee-hem"></div>' +
+    '<div class="tee-print"><img class="m" src="img/masque-motif.svg" alt=""><img class="w" src="img/logo.svg" alt=""></div><div class="tee-label"></div>');
+  P(cube, "+z", TW - 6, th, 0, ty + th / 2, tz + TD / 2, "tee side");
+  for (const sx of [1, -1]) P(cube, sx > 0 ? "+x" : "-x", TD - 6, th, sx * TW / 2, ty + th / 2, tz, "tee side");
+
   // ---------- couvercle (repère : charnière à l'arrière, en haut) ----------
   cube.appendChild(lidg);
   const LW = W - 4 * t;                     // le couvercle tient entre les deux côtés roulés
@@ -875,12 +907,13 @@ const box3d = (() => {
     cube.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
     lidg.style.transform = `translate3d(0, ${y0}px, ${-D / 2}px) rotateX(${lidA}deg)`;
     card.style.transform = open
-      ? `translate3d(0, ${y0 - 120}px, 20px) rotateY(${-ry}deg) rotateX(${-rx}deg)`
-      : `translate3d(0, ${y1 - t - 2}px, 0) rotateX(90deg) scale(.9)`;
+      ? `translate3d(0, ${y0 - 135}px, ${-D / 2 + 30}px) rotateY(${-ry}deg) rotateX(${-rx}deg) scale(.86)`
+      : `translate3d(0, ${y1 - t - 14}px, 30px) rotateX(90deg) scale(.8)`;
     shade();
   }
   function setOpen(v){
     open = v; lidA = open ? 112 : 0; card.classList.remove("fast");
+    if (open && !drag) { rx = Math.min(rx, -46); }
     stage.style.setProperty("--ty", open ? "80px" : "10px");
     btn.textContent = open ? "Fermer le coffret" : "Ouvrir le coffret";
     draw(); setTimeout(() => card.classList.add("fast"), 1100);
