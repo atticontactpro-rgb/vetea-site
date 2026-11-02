@@ -247,6 +247,14 @@ footer nav{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted)}
 .cart-foot .row{display:flex;justify-content:space-between;font-size:15px;color:var(--muted)}
 .cart-foot .total{color:var(--ink);font-weight:600;font-size:18px;margin-top:2px}
 .cart-foot .btn{width:100%;margin-top:8px}
+.ship-choice{border:0;margin:0 0 4px;padding:0;display:grid;gap:8px}
+.ship-choice legend{font-weight:600;font-size:15px;margin-bottom:8px;padding:0}
+.ship-choice label{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.ship-choice label:has(input:checked){border-color:var(--ink)}
+.ship-choice input{margin:0;accent-color:#000;width:18px;height:18px}
+.ship-choice b{display:block;font-size:14.5px}
+.ship-choice small{display:block;font-size:13px;color:var(--muted)}
+.ship-choice em{font-style:normal;font-weight:600;font-size:14.5px}
 .ship-bar{font-size:14px;background:var(--lagoon-soft);color:var(--lagoon);border-radius:10px;padding:10px 12px;font-weight:500}
 .ship-bar i{display:block;height:4px;background:#c8e2e0;border-radius:4px;margin-top:8px;overflow:hidden}
 .ship-bar i b{display:block;height:100%;background:var(--lagoon);border-radius:4px}
@@ -473,6 +481,11 @@ footer nav{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted)}
   </div>
   <div class="cart-items" id="cartitems"></div>
   <div class="cart-foot" id="cartfoot">
+    <fieldset class="ship-choice">
+      <legend>Livraison</legend>
+      <label><input type="radio" name="ship" value="relais" checked><span><b>Point relais Mondial Relay</b><small>3 à 5 jours ouvrés</small></span><em>Offerte</em></label>
+      <label><input type="radio" name="ship" value="colissimo"><span><b>À domicile, Colissimo</b><small>2 à 3 jours ouvrés</small></span><em id="colprice"></em></label>
+    </fieldset>
     <div class="ship-bar" id="shipbar"></div>
     <div class="row"><span>Sous-total</span><span id="subtotal"></span></div>
     <div class="row"><span>Livraison</span><span id="shipcost"></span></div>
@@ -491,8 +504,8 @@ footer nav{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted)}
 const CONFIG = {
   instagram: "https://www.instagram.com/vetea.official/",        // ← lien de ta page Insta Vétéa
   email: "veteadrop@gmail.com",              // ← adresse de contact
-  shipping: 4.90,                                  // ← frais de port (€), offerts avec un ensemble ou dès freeFrom
-  freeFrom: 100,                                   // ← livraison offerte à partir de ce montant (€)
+  colissimo: 9.90,                                 // ← Colissimo à domicile (€) ; Mondial Relay toujours offert
+  freeFrom: 100,                                   // ← Colissimo offert à partir de ce montant (€)
   christmasDeadline: "18 décembre",                // ← dernier jour de commande pour Noël
   showChristmas: true,                             // ← passer à false après Noël
 
@@ -607,7 +620,7 @@ function card(o, isBundle){
       ${pickers}
       <p class="stock-note" aria-live="polite"></p>
       <button class="btn" type="button" ${soldOut ? "disabled" : ""}>${soldOut ? "Épuisé" : "Ajouter au panier"}</button>
-      <p class="pay-note">${isBundle ? "Livraison offerte · " : ""}Paiement sécurisé par Stripe</p>
+      <p class="pay-note">Livraison offerte en point relais · Paiement sécurisé par Stripe</p>
     </div>
   </article>`;
 }
@@ -617,11 +630,11 @@ function render(){
   document.getElementById("bundles").innerHTML = BUNDLES.map(o => card(o, true)).join("");
   const all = Object.keys(CONFIG.stock).reduce((t, p) => t + total(p), 0);
   document.getElementById("count").innerHTML = `Édition limitée : <b>fais partie de la team</b>.`;
-  document.getElementById("packs-note").textContent = `Jusqu'à 30 € d'économie, et la livraison offerte. Une seule lettre et un seul coffret, avec toutes les pièces dedans.`;
-  document.getElementById("faq-ship").textContent = `Ta commande part sous 72 h en point relais ou à domicile, en France. Compte 2 à 4 jours de livraison. Frais de port : ${euro2(CONFIG.shipping)}, offerts avec un ensemble ou dès ${CONFIG.freeFrom} € d'achat.` + (CONFIG.showChristmas ? ` Pour Noël, commande avant le ${CONFIG.christmasDeadline}.` : "");
+  document.getElementById("packs-note").textContent = `Jusqu'à 30 € d'économie. Une seule lettre et un seul coffret, avec toutes les pièces dedans.`;
+  document.getElementById("faq-ship").textContent = `Ta commande part sous 72 h, en France. En point relais Mondial Relay, la livraison est toujours offerte (3 à 5 jours). À domicile avec Colissimo, elle coûte ${euro2(CONFIG.colissimo)}, offerte dès ${CONFIG.freeFrom} € d'achat (2 à 3 jours).` + (CONFIG.showChristmas ? ` Pour Noël, commande avant le ${CONFIG.christmasDeadline}.` : "");
   const strip = document.getElementById("strip");
   if (CONFIG.showChristmas) strip.innerHTML = `<strong>Pour Noël</strong>, commande avant le ${CONFIG.christmasDeadline}. Livré en coffret, avec une lettre au prénom de ton choix.`;
-  else strip.innerHTML = `Livré en coffret, avec une lettre à ton prénom. Livraison offerte sur les ensembles.`;
+  else strip.innerHTML = `Livré en coffret, avec une lettre à ton prénom. Livraison offerte en point relais.`;
   document.getElementById("f-insta").href = CONFIG.instagram;
   document.getElementById("f-mail").href = "mailto:" + CONFIG.email;
 }
@@ -668,9 +681,10 @@ function canAdd(id, sizes, n = 1, except){
 }
 function totals(){
   const sub = cart.reduce((t, i) => t + OFFERS[i.id].price * i.qty, 0);
-  const free = cart.some(i => OFFERS[i.id].bundle) || sub >= CONFIG.freeFrom;
-  const ship = cart.length ? (free ? 0 : CONFIG.shipping) : 0;
-  return { sub, ship, total: sub + ship, free };
+  const method = (document.querySelector('input[name="ship"]:checked') || {}).value || "relais";
+  const free = method === "relais" || sub >= CONFIG.freeFrom;
+  const ship = cart.length ? (free ? 0 : CONFIG.colissimo) : 0;
+  return { sub, ship, total: sub + ship, free, method };
 }
 function thumb(id){ const set = PHOTOS[id] && PHOTOS[id][gender]; return set ? set[0] : `img/${OFFERS[id].pieces[0]}.png`; }
 function renderCart(){
@@ -681,7 +695,7 @@ function renderCart(){
   if (!cart.length){
     box.innerHTML = `<div class="cart-empty"><p>Ton panier est vide.</p><a class="btn" href="#pieces" data-close>Voir les pièces</a></div>`;
     ["subtotal", "shipcost", "carttotal"].forEach(id => { document.getElementById(id).textContent = euro2(0); });
-    document.getElementById("shipbar").textContent = "";
+    document.getElementById("shipbar").hidden = true;
     foot.hidden = true; return;
   }
   foot.hidden = false;
@@ -701,9 +715,12 @@ function renderCart(){
   document.getElementById("shipcost").textContent = t.ship ? euro2(t.ship) : "Offerte";
   document.getElementById("carttotal").textContent = euro2(t.total);
   const gap = CONFIG.freeFrom - t.sub;
-  document.getElementById("shipbar").innerHTML = t.free
-    ? "La livraison est offerte."
-    : `Plus que ${euro2(gap)} pour la livraison offerte.<i><b style="width:${Math.min(100, t.sub / CONFIG.freeFrom * 100)}%"></b></i>`;
+  document.getElementById("colprice").textContent = t.sub >= CONFIG.freeFrom ? "Offerte" : euro2(CONFIG.colissimo);
+  const bar = document.getElementById("shipbar");
+  if (t.method === "colissimo" && gap > 0){
+    bar.hidden = false;
+    bar.innerHTML = `Plus que ${euro2(gap)} pour la livraison à domicile offerte.<i><b style="width:${Math.min(100, t.sub / CONFIG.freeFrom * 100)}%"></b></i>`;
+  } else bar.hidden = true;
 }
 let lastFocus = null;
 function openCart(){
@@ -739,6 +756,7 @@ document.getElementById("cartbtn").addEventListener("click", openCart);
 document.getElementById("cartclose").addEventListener("click", closeCart);
 document.getElementById("cartveil").addEventListener("click", closeCart);
 document.addEventListener("keydown", e => { if (e.key === "Escape" && document.getElementById("cart").classList.contains("on")) closeCart(); });
+document.getElementById("cart").addEventListener("change", e => { if (e.target.name === "ship") renderCart(); });
 document.getElementById("cart").addEventListener("click", e => {
   const q = e.target.closest("[data-q]"), rm = e.target.closest("[data-rm]");
   if (e.target.closest("[data-close]")) closeCart();
@@ -751,7 +769,7 @@ document.getElementById("checkout").addEventListener("click", async () => {
   b.disabled = true; b.textContent = "Ouverture du paiement…";
   try {
     const res = await fetch(CONFIG.checkoutUrl, { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart.map(i => ({ id: i.id, sizes: i.sizes, qty: i.qty })) }) });
+      body: JSON.stringify({ ship: totals().method, items: cart.map(i => ({ id: i.id, sizes: i.sizes, qty: i.qty })) }) });
     const data = await res.json();
     if (!res.ok || !data.url) throw new Error(data.error || "paiement");
     window.location.href = data.url;

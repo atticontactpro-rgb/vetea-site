@@ -34,14 +34,14 @@ const OFFERS = {
   packJT:   { name: "T-shirt + jogging Ink Spirit",      price: 105, pieces: ["jogging", "tshirt"], bundle: true },
   look:     { name: "Look complet Ink Spirit",           price: 179, pieces: ["sweat", "jogging", "tshirt"], bundle: true }
 };
-const SHIPPING = 490;   // en centimes
-const FREE_FROM = 100;  // en euros
+const COLISSIMO = 990;  // Colissimo à domicile, en centimes (Mondial Relay toujours offert)
+const FREE_FROM = 100;  // Colissimo offert à partir de ce montant (€)
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "" };
   const site = process.env.URL || `https://${event.headers.host}`;
-  let items;
-  try { items = JSON.parse(event.body).items; } catch { return json(400, { error: "Panier illisible" }); }
+  let items, ship;
+  try { ({ items, ship } = JSON.parse(event.body)); } catch { return json(400, { error: "Panier illisible" }); }
   if (!Array.isArray(items) || !items.length || items.length > 20) return json(400, { error: "Panier vide" });
 
   const line_items = [], summary = [];
@@ -60,7 +60,18 @@ exports.handler = async (event) => {
     subtotal += o.price * qty;
     if (o.bundle) hasBundle = true;
   }
-  const free = hasBundle || subtotal >= FREE_FROM;
+  const colFree = subtotal >= FREE_FROM;
+  const relais = { shipping_rate_data: {
+    type: "fixed_amount", display_name: "Point relais Mondial Relay (offert)",
+    fixed_amount: { amount: 0, currency: "eur" },
+    delivery_estimate: { minimum: { unit: "business_day", value: 3 }, maximum: { unit: "business_day", value: 5 } }
+  } };
+  const colissimo = { shipping_rate_data: {
+    type: "fixed_amount", display_name: colFree ? "À domicile, Colissimo (offert)" : "À domicile, Colissimo",
+    fixed_amount: { amount: colFree ? 0 : COLISSIMO, currency: "eur" },
+    delivery_estimate: { minimum: { unit: "business_day", value: 2 }, maximum: { unit: "business_day", value: 3 } }
+  } };
+  const shipping_options = ship === "colissimo" ? [colissimo, relais] : [relais, colissimo];
 
   let session;
   try { session = await createSession({
@@ -69,14 +80,11 @@ exports.handler = async (event) => {
     locale: "fr",
     allow_promotion_codes: "true",
     shipping_address_collection: { allowed_countries: ["FR"] },
-    shipping_options: [{ shipping_rate_data: {
-      type: "fixed_amount", display_name: free ? "Livraison offerte" : "Livraison suivie",
-      fixed_amount: { amount: free ? 0 : SHIPPING, currency: "eur" },
-      delivery_estimate: { minimum: { unit: "business_day", value: 3 }, maximum: { unit: "business_day", value: 6 } }
-    } }],
+    shipping_options,
     phone_number_collection: { enabled: "true" },
     custom_fields: [
       { key: "prenom", label: { type: "custom", custom: "Prénom pour la lettre" }, type: "text", text: { maximum_length: 24 } },
+      { key: "relais", label: { type: "custom", custom: "Point relais souhaité, si Mondial Relay (facultatif)" }, type: "text", optional: "true", text: { maximum_length: 80 } },
       { key: "cadeau", label: { type: "custom", custom: "Un petit mot pour la lettre (facultatif)" }, type: "text", optional: "true", text: { maximum_length: 120 } }
     ],
     metadata: { commande: summary.join(" | ").slice(0, 490) },
