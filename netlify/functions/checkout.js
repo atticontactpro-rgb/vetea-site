@@ -80,6 +80,10 @@ exports.handler = async (event) => {
       { key: "cadeau", label: { type: "custom", custom: "Un petit mot pour la lettre (facultatif)" }, type: "text", optional: "true", text: { maximum_length: 120 } }
     ],
     metadata: { commande: summary.join(" | ").slice(0, 490) },
+    payment_intent_data: {
+      description: summary.join(" | ").slice(0, 490),
+      metadata: { commande: summary.join(" | ").slice(0, 490) }
+    },
     success_url: `${site}/merci.html`,
     cancel_url: `${site}/#pieces`
   }); } catch (e) { return json(502, { error: "Le paiement n'a pas pu s'ouvrir. Réessaie dans un instant." }); }
