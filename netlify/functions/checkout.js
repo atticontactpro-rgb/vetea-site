@@ -32,7 +32,6 @@ const OFFERS = {
   tshirt:   { name: "T-shirt Ink Spirit",                price: 45,  pieces: ["tshirt"] },
   ensemble: { name: "Sweat + jogging Ink Spirit", price: 159, pieces: ["sweat", "jogging"], bundle: true },
   packJT:   { name: "T-shirt + jogging Ink Spirit",      price: 105, pieces: ["jogging", "tshirt"], bundle: true },
-  test:     { name: "Test paiement Vétéa (à rembourser)", price: 1, pieces: ["tshirt"] },
   look:     { name: "Look complet Ink Spirit",           price: 179, pieces: ["sweat", "jogging", "tshirt"], bundle: true }
 };
 const COLISSIMO = 990;  // Colissimo à domicile, en centimes (Mondial Relay toujours offert)
