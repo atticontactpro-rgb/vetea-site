@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Test paiement · Vétéa</title>
+<style>
+body{margin:0;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;background:#fff;color:#000}
+main{max-width:420px;padding:24px;text-align:center}
+h1{font-size:28px;margin:0 0 12px}
+p{color:#555;line-height:1.5}
+button{font:600 16px system-ui;background:#000;color:#fff;border:0;border-radius:999px;padding:16px 28px;cursor:pointer;margin-top:12px}
+button[disabled]{opacity:.5}
+#err{color:#b00020;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Test de paiement : 1 €</h1>
+  <p>Page cachée pour vérifier le paiement réel. Choisis « Point relais » à l'étape suivante (livraison offerte), paie, puis rembourse-toi dans Stripe.</p>
+  <button id="go" type="button">Payer 1 €</button>
+  <p id="err"></p>
+</main>
+<script>
+document.getElementById("go").addEventListener("click", async () => {
+  const b = document.getElementById("go"), err = document.getElementById("err");
+  b.disabled = true; b.textContent = "Ouverture du paiement…"; err.textContent = "";
+  try {
+    const r = await fetch("/.netlify/functions/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ship: "relais", items: [{ id: "test", sizes: ["M"], qty: 1 }] }) });
+    const d = await r.json();
+    if (!r.ok || !d.url) throw new Error(d.error || "Erreur");
+    location.href = d.url;
+  } catch (e) { err.textContent = "Erreur : " + e.message; b.disabled = false; b.textContent = "Payer 1 €"; }
+});
+</script>
+</body>
+</html>
